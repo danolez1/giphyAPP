@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <!--Created by Daniel Fatunmbi (2hrs/7-10pm/2/25/17)-->
+        <title>Playing with Giphy api</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>
+            body,div,input{
+                margin: 0px 0px;
+                padding: 0px 0px;
+                background-color: none;
+            }
+            #header{
+               font-family: Small Fonts;
+               font-weight: bolder;
+               font-size: 40px;
+               color: #255625;
+               margin-left: 400px;
+               margin-top: 10px;
+               height: 40px;
+               width:900px;
+            }
+            #search{
+                margin-top: 20px;
+                border-radius: 12px;
+                overflow: hidden;
+                margin-left: 300px;
+                width:500px;
+                border:2px solid #cacaca;
+                height: 22px;
+                font-family: Consolas;
+                font-size: 15px;
+            }
+            #query{
+                padding-top: 2.5px;
+                margin-left: 7px;
+                width:78%;
+               height: 20px;
+               float: left;
+               color:#006666;
+               outline: none;
+               overflow: hidden;
+            }
+            [contenteditable]#query br{
+                display:none;
+            }
+            #submit{
+                margin-left: -5px;
+                 width:21.5%;
+                  height: 22px;
+                  border-radius: 12px;
+                      border:none;background-color:#204d74 ;color:#ffffff;outline: none;
+            }
+            #result{
+                width:1100px;
+                padding: 50px 100px;                
+            }
+            .resultBars{
+                width:170px;
+                height: 150px;
+                float:left;
+                margin-right: 40px;
+                margin-top: 50px
+            }
+            .display{
+                width:170px; 
+                height: 99px;
+            }
+            .description{
+                width:170px;
+                margin-top: -6px;
+                height: 60px;
+                background-color: #cacaca;
+            }
+            .name{
+                font-family: Calibri;
+                font-size: 12px;
+                text-decoration: none;
+                color:#445c7d;
+                margin-left:10px;
+                height:20px;
+                overflow:hidden;
+                
+            }
+            .download{
+                font-family: Calibri;
+                font-size: 11px;
+                text-decoration: none;
+                color:#145c7d;
+                margin-left:7px;
+            }
+            .size{
+                font-family: Calibri;
+                font-size: 11px;
+                text-decoration: none;
+                color:#465c7d;
+                margin-left:35px;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="header">Giphy <span style="color:#269abc;margin-left: 40px;">api</span></div>
+        <div id="body">
+            <div id="search">
+                <div id="query" contentEditable="true" ></div>
+                <button id="submit">Search</button>
+            </div>
+            <div id="result">
+            </div>
+        </div>
+       <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+        <script type="text/javascript">
+            
+            var userInp = document.getElementById("query");
+            var submitBtn = document.getElementById("submit");
+            
+            
+            userInp.addEventListener("keypress",function(){
+                keyAnalyse = userInp.innerHTML.split("<div>");                
+         if(keyAnalyse === null || keyAnalyse === "" || keyAnalyse === undefined || keyAnalyse.length<2){}
+       else{
+                  var query = userInp.innerHTML;
+              if(query === null||query === undefined||query === ""){   }
+              else{search(query.trim().replace( / /g,"+"));}
+           }
+            });
+            submitBtn.addEventListener("click",function(){
+              var query = userInp.innerHTML;
+              if(query === null||query === undefined||query === ""){              }
+              else{search(query.trim().replace( / /g,"+"));}
+            });
+            function search(query){
+                var resultDiv = document.getElementById('result');
+                resultBar = document.getElementsByClassName("resultBars");
+                if(resultBar == undefined || resultBar == null || resultBar == ""){}
+               else{    
+                   resultDiv.innerHTML = ""; 
+                    }
+                              
+                var load = loading();
+             var api = 'http://api.giphy.com/v1/gifs/search?q=';
+               // Setting limit for maximum amount of search results displayed on one page.
+                var limit = '&limit=35';
+                // API public key.
+          var key = '&api_key=dc6zaTOxFJmzC';
+           var queryURL = api +query + key + limit;
+            //  Using AJAX to call GIPHY API (note that the .done() function waits for the API to respond)
+           $.ajax({url:queryURL, method:'GET'}).done(function(response){
+               load.loading.style.display = "none";
+               // This is the API response data. It's a JSON object of 24 gifs
+                    console.log(response.data);
+                   
+                    for(var i =0; i<response.data.length ;i++){
+                        var input = response.data[i];
+                        result(input.images.original.url,input.slug,input.images.original.url,input.images.original.size);
+                    }
+           });
+            }
+            function loading(){
+                 var result = [];
+                var resultDiv = document.getElementById('result');
+                var loading = document.createElement("img");
+                 resultDiv.appendChild(loading);
+                 loading.style.marginLeft = "400px";
+                 loading.style.marginTop = "10px";
+                 loading.style.position = "absolute";
+                 loading.setAttribute("src","loader.gif")
+                 result["loading"] = loading;
+                 return result;
+            }
+    function result(imageSrc,nameText,downloadLink,imageSize){
+        var result = [];
+                var resultDiv = document.getElementById('result');
+                var resultBar = document.createElement("div");
+                resultBar.setAttribute("class","resultBars");
+                var display = document.createElement("img");
+                display.setAttribute("class","display");
+                var descriptionBar = document.createElement("div");
+                descriptionBar.setAttribute("class","description");
+                var name = document.createElement("a");
+                name.setAttribute("class","name");
+                var download =  document.createElement("a");
+                download.setAttribute("class","download");
+                var size =  document.createElement("span");
+                size.setAttribute("class","size");
+                resultDiv.appendChild(resultBar);
+                resultBar.appendChild(display);
+                resultBar.appendChild(descriptionBar);
+                descriptionBar.appendChild(name);
+                descriptionBar.appendChild(document.createElement("br"));
+                descriptionBar.appendChild(download);
+                descriptionBar.appendChild(size);
+                
+                display.setAttribute("src",imageSrc);
+                if(nameText.length > 40){
+                    nameText = nameText.substring(0,35)+"...";
+                }
+                name.innerHTML = nameText;
+                download.innerHTML = "|Download|";
+                download.setAttribute("href",downloadLink);
+                value = (parseInt(imageSize)/1024);
+                if(value>1000){
+                    value = value/1024;
+                     size.innerHTML = value.toFixed(2)+"MB";
+                }
+              else{ size.innerHTML = value.toFixed(2)+"KB";}
+               
+                result["download"] = download;
+                result["name"] = name;
+                result["descriptionBar"] = descriptionBar;
+                result["display"] = display;
+                result["resultBar"] = resultBar;
+                result["resultDiv"] = resultDiv;
+                result["size"] = size;
+                return result;
+            }
+        </script>
+    </body>
+</html>
